@@ -1,8 +1,8 @@
-import {loadConditionalCSS} from "../../globals.js";
+import { createLinkElement, container } from "../../globals.js";
 
 export default class GamePage {
     constructor() {
-        loadConditionalCSS("./gamePage.css");
+        container.appendChild(createLinkElement("./components/gamePage/gamePage.css"));
     }
 
     render() {
