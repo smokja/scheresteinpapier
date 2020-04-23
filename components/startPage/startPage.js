@@ -40,6 +40,26 @@ export default class StartPage {
         return template({ records: records });
     }
 
+    renderConfig() {
+        return Handlebars.compile("" +
+            "<div id='config'>" +
+            "<h1>Ein neues Spiel starten</h1>" +
+            "<div id='config-area'>" +
+            "   <label class='switch'>" +
+            "       <input id='server-check' type='checkbox'>" +
+            "       <span class='slider round'></span>" +
+            "   </label>" +
+            "   <label id='server-check-label' for='server-check'>Mit Server spielen?</label>" +
+
+            "</div>" +
+            "<button id='play-game-button'>" +
+            "    Spiel starten" +
+            "</button>" +
+            "</div>" +
+            ""
+        )();
+    }
+
     render() {
         let { records } = this.state;
         container.innerHTML += "" +
@@ -47,7 +67,7 @@ export default class StartPage {
             this.renderRankingTable(records) +
         "</div>" +
         "<div id='config-container'>" +
-        "" +
+            this.renderConfig() +
         "</div>";
     }
 }
