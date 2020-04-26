@@ -9,12 +9,23 @@ export default class App {
             serverSide: false
         }
 
+        // function bind because it is passed onto child components
         this.switchPage = this.switchPage.bind(this);
+        this.getServerSide = this.getServerSide.bind(this);
+        this.switchServerside = this.switchServerside.bind(this);
+    }
+
+    getServerSide() {
+        return this.state.serverSide;
     }
 
     switchPage() {
         this.state.playing = !this.state.playing;
         this.render();
+    }
+
+    switchServerside(value = !this.state.serverSide) {
+        this.state.serverSide = value;
     }
 
     render() {
@@ -23,9 +34,9 @@ export default class App {
 
         container.innerHTML = "";
         if (!playing) {
-            new StartPage(this.switchPage);
+            new StartPage(this.switchPage, this.switchServerside, this.getServerSide);
         } else {
-            new GamePage(this.switchPage);
+            new GamePage(this.switchPage, this.getServerSide);
         }
     }
 

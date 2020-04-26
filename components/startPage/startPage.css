@@ -3,6 +3,12 @@
 
     border-top: 3px solid;
 }
+
+#ranking-container {
+    height: 500px;
+    overflow-y: scroll;
+}
+
 #play-game-button {
     align-self: flex-end;
     height: 30px;

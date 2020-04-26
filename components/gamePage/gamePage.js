@@ -1,9 +1,15 @@
 import { createLinkElement, container } from "../../globals.js";
 
 export default class GamePage {
-    constructor(switchPage) {
+    constructor(switchPage, getServerSide) {
         this.switchPage = switchPage;
+        this.getServerSide = getServerSide;
         container.appendChild(createLinkElement("./components/gamePage/gamePage.css"));
+
+        this.state = {
+            serverSide: this.getServerSide()
+        };
+
         this.render();
         this.mountEventListeners();
     }

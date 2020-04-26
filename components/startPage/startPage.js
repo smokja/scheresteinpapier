@@ -1,14 +1,16 @@
 import { container, createLinkElement, server } from "../../globals.js";
 export default class StartPage {
-    constructor(switchPage) {
+    constructor(switchPage, switchServerside, getServerSide) {
+        this.switchServerSide = switchServerside;
         this.switchPage = switchPage;
+        this.getServerSide = getServerSide;
         container.appendChild(createLinkElement("./components/startPage/startPage.css"));
         console.log(container);
         this.state = {
             recordsOnline: [],
-            records: [],
-            serverSide: false
+            records: []
         }
+        // bind this function, because it will be called from another component as an event handler
         this.serverSwitchChanged = this.serverSwitchChanged.bind(this);
         this.render();
         this.mountEventListener();
@@ -21,16 +23,14 @@ export default class StartPage {
 
     serverSwitchChanged(e) {
         let serverSide = e.target.checked;
-        console.log(serverSide);
-        this.state.serverSide = serverSide;
-
+        this.switchServerSide(serverSide);
         if (serverSide) {
             this.updateRankingTable(true);
             fetch(server + "/ranking")
                 .then(res => res.json())
                 .then(json => {
                     this.state.recordsOnline = json;
-                    console.log(this.state.records);
+                    console.log(this.state.recordsOnline);
                     this.updateRankingTable(false);
                 });
         } else {
@@ -39,13 +39,15 @@ export default class StartPage {
     }
 
     updateRankingTable(loading = false) {
-        let { serverSide, recordsOnline, records } = this.state;
+        let { recordsOnline, records } = this.state;
         let rankingContainer = document.getElementById("ranking-container");
+
+        console.log(this.getServerSide());
 
         if (loading) {
             rankingContainer.innerHTML = "Loading...";
         } else {
-            rankingContainer.innerHTML = this.renderRankingTable(serverSide ? recordsOnline : records);
+            rankingContainer.innerHTML = this.renderRankingTable(this.getServerSide() ? recordsOnline : records);
         }
     }
     renderRankingTable(records) {
@@ -76,18 +78,20 @@ export default class StartPage {
     renderConfig() {
         return Handlebars.compile("" +
             "<div id='config'>" +
-            "<h1>Ein neues Spiel starten</h1>" +
-            "<div id='config-area'>" +
-            "   <label id='server-switch' class='switch'>" +
-            "       <input id='server-check' type='checkbox'>" +
-            "       <span class='slider round'></span>" +
-            "   </label>" +
-            "   <label id='server-check-label' for='server-check'>Mit Server spielen?</label>" +
-
-            "</div>" +
-            "<button id='play-game-button'>" +
-            "    Spiel starten" +
-            "</button>" +
+            "   <h1>Ein neues Spiel starten</h1>" +
+            "   <div id='config-area'>" +
+            "       <label id='server-switch' class='switch'>" +
+            "           <input id='server-check' type='checkbox'>" +
+            "           <span class='slider round'></span>" +
+            "       </label>" +
+            "       <label id='server-check-label' for='server-check'>Mit Server spielen?</label>" +
+            "       <label for='username-field'>Username</label>" +
+            "       <input id='username-field' />" +
+            "   </div>" +
+            "   " +
+            "   <button id='play-game-button'>" +
+            "       Spiel starten" +
+            "   </button>" +
             "</div>"
         )();
     }
