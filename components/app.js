@@ -23,11 +23,9 @@ export default class App {
 
         container.innerHTML = "";
         if (!playing) {
-            let startPage = new StartPage(this.switchPage);
-            startPage.render();
+            new StartPage(this.switchPage);
         } else {
-            let gamePage = new GamePage(this.switchPage);
-            gamePage.render();
+            new GamePage(this.switchPage);
         }
     }
 

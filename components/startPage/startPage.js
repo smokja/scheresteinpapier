@@ -1,40 +1,73 @@
-import { container, createLinkElement } from "../../globals.js";
+import { container, createLinkElement, server } from "../../globals.js";
 export default class StartPage {
     constructor(switchPage) {
         this.switchPage = switchPage;
         container.appendChild(createLinkElement("./components/startPage/startPage.css"));
         console.log(container);
         this.state = {
-            records: [
-                { rank: 1, name: "peter", wins: 12},
-                { rank: 2, name: "peter2", wins: 11},
-                { rank: 3, name: "peter3", wins: 10},
-                { rank: 4, name: "peter4", wins: 9},
-            ]
+            recordsOnline: [],
+            records: [],
+            serverSide: false
+        }
+        this.serverSwitchChanged = this.serverSwitchChanged.bind(this);
+        this.render();
+        this.mountEventListener();
+    }
+
+    mountEventListener() {
+        document.getElementById("server-switch").addEventListener("change", this.serverSwitchChanged);
+        document.getElementById("play-game-button").addEventListener("click", () => this.switchPage());
+    }
+
+    serverSwitchChanged(e) {
+        let serverSide = e.target.checked;
+        console.log(serverSide);
+        this.state.serverSide = serverSide;
+
+        if (serverSide) {
+            this.updateRankingTable(true);
+            fetch(server + "/ranking")
+                .then(res => res.json())
+                .then(json => {
+                    this.state.recordsOnline = json;
+                    console.log(this.state.records);
+                    this.updateRankingTable(false);
+                });
+        } else {
+            this.updateRankingTable(false);
         }
     }
 
+    updateRankingTable(loading = false) {
+        let { serverSide, recordsOnline, records } = this.state;
+        let rankingContainer = document.getElementById("ranking-container");
+
+        if (loading) {
+            rankingContainer.innerHTML = "Loading...";
+        } else {
+            rankingContainer.innerHTML = this.renderRankingTable(serverSide ? recordsOnline : records);
+        }
+    }
     renderRankingTable(records) {
 
         let template = Handlebars.compile("" +
             "<table id='ranking-table'>" +
             "   <tr>" +
-            "       <th>Rang</th>" +
+            "       <th>Lost</th>" +
             "        <th>Name</th>" +
-            "       <th>Siege</th>" +
+            "       <th>Win</th>" +
             "   </tr>" +
             "" +
             "{{#each records}}" +
             "" +
             "   <tr>" +
-            "       <td>{{this.rank}}</td>" +
-            "       <td>{{this.name}}</td>" +
-            "       <td>{{this.wins}}</td>" +
+            "       <td>{{this.lost}}</td>" +
+            "       <td>{{this.user}}</td>" +
+            "       <td>{{this.win}}</td>" +
             "   </tr>" +
             "" +
             "{{/each}}" +
-            "</table>" +
-            ""
+            "</table>"
         );
 
         return template({ records: records });
@@ -45,7 +78,7 @@ export default class StartPage {
             "<div id='config'>" +
             "<h1>Ein neues Spiel starten</h1>" +
             "<div id='config-area'>" +
-            "   <label class='switch'>" +
+            "   <label id='server-switch' class='switch'>" +
             "       <input id='server-check' type='checkbox'>" +
             "       <span class='slider round'></span>" +
             "   </label>" +
@@ -55,8 +88,7 @@ export default class StartPage {
             "<button id='play-game-button'>" +
             "    Spiel starten" +
             "</button>" +
-            "</div>" +
-            ""
+            "</div>"
         )();
     }
 
