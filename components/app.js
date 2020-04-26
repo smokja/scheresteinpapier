@@ -6,17 +6,35 @@ export default class App {
     constructor() {
         this.state = {
             playing: false,
-            serverSide: false
+            gameState: {
+                serverSide: false,
+                username: ""
+            }
         }
 
         // function bind because it is passed onto child components
         this.switchPage = this.switchPage.bind(this);
         this.getServerSide = this.getServerSide.bind(this);
         this.switchServerside = this.switchServerside.bind(this);
+        this.getGameState = this.getGameState.bind(this);
+        this.setGameState = this.setGameState.bind(this);
+        this.render();
+    }
+
+    getGameState() {
+        return this.state.gameState;
+    }
+
+    setGameState(gameState) {
+        this.state.gameState = gameState;
     }
 
     getServerSide() {
-        return this.state.serverSide;
+        return this.state.gameState.serverSide;
+    }
+
+    setUsername(username = "") {
+        this.state.gameState.username = username;
     }
 
     switchPage() {
@@ -24,8 +42,8 @@ export default class App {
         this.render();
     }
 
-    switchServerside(value = !this.state.serverSide) {
-        this.state.serverSide = value;
+    switchServerside(value = !this.state.gameState.serverSide) {
+        this.state.gameState.serverSide = value;
     }
 
     render() {
@@ -34,14 +52,10 @@ export default class App {
 
         container.innerHTML = "";
         if (!playing) {
-            new StartPage(this.switchPage, this.switchServerside, this.getServerSide);
+            new StartPage(this.switchPage, this.setGameState, this.getGameState);
         } else {
-            new GamePage(this.switchPage, this.getServerSide);
+            new GamePage(this.switchPage, this.state.gameState);
         }
-    }
-
-    dispose() {
-
     }
 }
 

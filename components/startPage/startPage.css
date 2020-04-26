@@ -1,6 +1,9 @@
 
-#config-container {
+.not-filled {
+    background-color: #d48184;
+}
 
+#config-container {
     border-top: 3px solid;
 }
 

@@ -1,14 +1,11 @@
 import { createLinkElement, container } from "../../globals.js";
 
 export default class GamePage {
-    constructor(switchPage, getServerSide) {
+    constructor(switchPage, gameState) {
         this.switchPage = switchPage;
-        this.getServerSide = getServerSide;
         container.appendChild(createLinkElement("./components/gamePage/gamePage.css"));
 
-        this.state = {
-            serverSide: this.getServerSide()
-        };
+        this.state = gameState;
 
         this.render();
         this.mountEventListeners();
@@ -19,6 +16,7 @@ export default class GamePage {
     }
 
     render() {
-        container.innerHTML += "<button id='go-back-button'>Go back</button>"
+
+        container.innerHTML += this.state.username + "<button id='go-back-button'>Go back</button>"
     }
 }

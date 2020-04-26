@@ -1,29 +1,48 @@
 import { container, createLinkElement, server } from "../../globals.js";
 export default class StartPage {
-    constructor(switchPage, switchServerside, getServerSide) {
-        this.switchServerSide = switchServerside;
+    constructor(switchPage, setGameState, getGameState) {
         this.switchPage = switchPage;
-        this.getServerSide = getServerSide;
+        this.setGameState = setGameState;
+        this.getGameState = getGameState;
         container.appendChild(createLinkElement("./components/startPage/startPage.css"));
         console.log(container);
         this.state = {
             recordsOnline: [],
             records: []
         }
-        // bind this function, because it will be called from another component as an event handler
         this.serverSwitchChanged = this.serverSwitchChanged.bind(this);
+        this.playGame = this.playGame.bind(this);
         this.render();
         this.mountEventListener();
     }
 
     mountEventListener() {
         document.getElementById("server-switch").addEventListener("change", this.serverSwitchChanged);
-        document.getElementById("play-game-button").addEventListener("click", () => this.switchPage());
+        document.getElementById("play-game-button").addEventListener("click", this.playGame);
+    }
+
+    playGame() {
+        let username = document.getElementById("username-field");
+        if (username.checkValidity()) {
+            let gameState = this.getGameState();
+            this.setGameState({
+                username: username.value,
+                serverSide: gameState.serverSide
+            });
+            this.switchPage();
+        } else {
+            username.classList.add("not-filled");
+            alert("Username is required");
+        }
     }
 
     serverSwitchChanged(e) {
+        let gameState = this.getGameState();
         let serverSide = e.target.checked;
-        this.switchServerSide(serverSide);
+        this.setGameState({
+            serverSide: serverSide,
+            username: gameState.username
+        });
         if (serverSide) {
             this.updateRankingTable(true);
             fetch(server + "/ranking")
@@ -42,12 +61,10 @@ export default class StartPage {
         let { recordsOnline, records } = this.state;
         let rankingContainer = document.getElementById("ranking-container");
 
-        console.log(this.getServerSide());
-
         if (loading) {
             rankingContainer.innerHTML = "Loading...";
         } else {
-            rankingContainer.innerHTML = this.renderRankingTable(this.getServerSide() ? recordsOnline : records);
+            rankingContainer.innerHTML = this.renderRankingTable(this.getGameState().serverSide ? recordsOnline : records);
         }
     }
     renderRankingTable(records) {
@@ -86,7 +103,7 @@ export default class StartPage {
             "       </label>" +
             "       <label id='server-check-label' for='server-check'>Mit Server spielen?</label>" +
             "       <label for='username-field'>Username</label>" +
-            "       <input id='username-field' />" +
+            "       <input required id='username-field' />" +
             "   </div>" +
             "   " +
             "   <button id='play-game-button'>" +
