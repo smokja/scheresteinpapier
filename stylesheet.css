@@ -4,8 +4,11 @@
     box-sizing: border-box;
 }
 
-#main-container {
+body {
     margin: auto;
-    width:  450px;
+    min-width:  880px;
     padding: 10px;
 }
+
+
+

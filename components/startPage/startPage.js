@@ -44,17 +44,21 @@ export default class StartPage {
             username: gameState.username
         });
         if (serverSide) {
-            this.updateRankingTable(true);
-            fetch(server + "/ranking")
-                .then(res => res.json())
-                .then(json => {
-                    this.state.recordsOnline = json;
-                    console.log(this.state.recordsOnline);
-                    this.updateRankingTable(false);
-                });
+            this.loadOnlineRanking();
         } else {
             this.updateRankingTable(false);
         }
+    }
+
+    loadOnlineRanking() {
+        this.updateRankingTable(true);
+        fetch(server + "/ranking")
+            .then(res => res.json())
+            .then(json => {
+                this.state.recordsOnline = json;
+                console.log(this.state.recordsOnline);
+                this.updateRankingTable(false);
+            });
     }
 
     updateRankingTable(loading = false) {
@@ -68,21 +72,13 @@ export default class StartPage {
         }
     }
     renderRankingTable(records) {
-
         let template = Handlebars.compile("" +
+            "<h1>Rangliste</h1>" +
             "<table id='ranking-table'>" +
-            "   <tr>" +
-            "       <th>Lost</th>" +
-            "        <th>Name</th>" +
-            "       <th>Win</th>" +
-            "   </tr>" +
-            "" +
             "{{#each records}}" +
             "" +
             "   <tr>" +
-            "       <td>{{this.lost}}</td>" +
-            "       <td>{{this.user}}</td>" +
-            "       <td>{{this.win}}</td>" +
+            "       <td><h2>{{this.place}}. Platz: {{this.user}}</h2>Siege: {{this.win}}</td>" +
             "   </tr>" +
             "" +
             "{{/each}}" +
@@ -94,33 +90,33 @@ export default class StartPage {
 
     renderConfig() {
         return Handlebars.compile("" +
-            "<div id='config'>" +
-            "   <h1>Ein neues Spiel starten</h1>" +
-            "   <div id='config-area'>" +
-            "       <label id='server-switch' class='switch'>" +
-            "           <input id='server-check' type='checkbox'>" +
-            "           <span class='slider round'></span>" +
-            "       </label>" +
-            "       <label id='server-check-label' for='server-check'>Mit Server spielen?</label>" +
-            "       <label for='username-field'>Username</label>" +
-            "       <input required id='username-field' />" +
-            "   </div>" +
-            "   " +
-            "   <button id='play-game-button'>" +
-            "       Spiel starten" +
-            "   </button>" +
-            "</div>"
+            "<label id='server-switch' class='switch' for='server-check'>Mit Server spielen?" +
+            "    <input id='server-check' type='checkbox'>" +
+            "</label>" +
+            "<label for='username-field'>Username" +
+            "    <input required id='username-field' />" +
+            "</label>" +
+            "<button id='play-game-button'>" +
+            "   Spiel starten" +
+            "</button>"
         )();
     }
 
     render() {
         let { records } = this.state;
         container.innerHTML += "" +
-        "<div id='ranking-container'>" +
-            this.renderRankingTable(records) +
-        "</div>" +
-        "<div id='config-container'>" +
-            this.renderConfig() +
-        "</div>";
+            "<header><h1>Willkommen beim besten Spiel der Welt: Schere-Stein-Papier</h1></header>" +
+            "" +
+            "<section id='ranking-container'>" +
+                this.renderRankingTable(records) +
+            "</section>" +
+            "<section id='config-container'>" +
+            "   <h1>Ein neues Spiel starten</h1>" +
+                this.renderConfig() +
+            "</section>";
+
+        if (this.getGameState().serverSide) {
+            this.loadOnlineRanking();
+        }
     }
 }

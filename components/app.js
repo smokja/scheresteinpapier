@@ -7,7 +7,7 @@ export default class App {
         this.state = {
             playing: false,
             gameState: {
-                serverSide: false,
+                serverSide: true,
                 username: ""
             }
         }
