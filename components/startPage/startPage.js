@@ -55,7 +55,7 @@ export default class StartPage {
         fetch(server + "/ranking")
             .then(res => res.json())
             .then(json => {
-                this.state.recordsOnline = json;
+                this.state.recordsOnline = Object.values(json);
                 console.log(this.state.recordsOnline);
                 this.updateRankingTable(false);
             });
@@ -76,7 +76,7 @@ export default class StartPage {
         if (loading) {
             rankingContainer.innerHTML = "Loading...";
         } else {
-            rankingContainer.innerHTML = this.renderRankingTable(this.getGameState().serverSide ? Object.values(recordsOnline) : records);
+            rankingContainer.innerHTML = this.renderRankingTable(this.getGameState().serverSide ? recordsOnline : records);
         }
     }
 

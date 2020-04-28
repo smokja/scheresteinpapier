@@ -11,7 +11,8 @@ header {
     padding-left: 100px;
     padding-right: 100px;
     display:flex;
-    height: 720px;
+    min-height: 720px;
+    height: 90%;
 }
 
 #game-history {
@@ -21,10 +22,27 @@ header {
 }
 
 #play-zone {
+    padding: 5px;
     background-color: aquamarine;
     width: 100%;
 }
 
 body {
     min-width: 960px;
+}
+
+#play-pc-area {
+    background-color: coral;
+    height: 40%;
+}
+
+#play-user-area {
+    height: 50%;
+    background-color: crimson;
+}
+
+#play-border-area {
+    height: 10%;
+    background-color: darkorange;
+
 }

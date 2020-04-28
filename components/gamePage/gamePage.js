@@ -18,6 +18,28 @@ export default class GamePage {
         document.getElementById("go-back-button").addEventListener("click", () => this.switchPage());
     }
 
+    updatePlayZone() {
+        let playZoneContainer = document.getElementById("play-zone");
+
+        playZoneContainer.innerHTML = "" +
+            "<div id='play-pc-area'>" +
+            "   pc area" +
+            "   <div class='card'></div>" +
+            "</div>" +
+            "<div id='play-border-area'>" +
+            "   border area" +
+            "</div>" +
+            "<div id='play-user-area'>" +
+            "   user area" +
+            "   <div class='card'></div>" +
+            "   <div class='card'></div>" +
+            "   <div class='card'></div>" +
+            "   <div class='card'></div>" +
+            "   <div class='card'></div>" +
+            "</div>" +
+            "";
+    }
+
     updateGameHistory(playedGames) {
         let gameHistoryContainer = document.getElementById("game-history");
         gameHistoryContainer.innerHTML = Handlebars.compile("" +
@@ -47,10 +69,12 @@ export default class GamePage {
             "<header id='game-header'><h1>Schere Stein Papier (Brunnen und Streichholz edition)</h1></header>" +
             "<section id='game-body'>" +
             "   <aside id='game-history' ></aside>" +
-            "   <section id='play-zone'><h1>Aktuelles Spiel</h1>" +
+            "   <section id='play-zone'>" +
             "   </section>" +
             "</section>"
         )();
+
+        this.updatePlayZone();
 
         // testData
         this.updateGameHistory([
