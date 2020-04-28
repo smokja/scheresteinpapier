@@ -1,2 +1,30 @@
 * {
 }
+
+header {
+    margin-bottom: 20px;
+    text-align: center;
+    background-color: antiquewhite;
+}
+
+#game-body {
+    padding-left: 100px;
+    padding-right: 100px;
+    display:flex;
+    height: 720px;
+}
+
+#game-history {
+    padding: 5px;
+    background-color: #d48184;
+    width: 225px;
+}
+
+#play-zone {
+    background-color: aquamarine;
+    width: 100%;
+}
+
+body {
+    min-width: 960px;
+}

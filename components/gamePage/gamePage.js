@@ -18,15 +18,47 @@ export default class GamePage {
         document.getElementById("go-back-button").addEventListener("click", () => this.switchPage());
     }
 
+    updateGameHistory(playedGames) {
+        let gameHistoryContainer = document.getElementById("game-history");
+        gameHistoryContainer.innerHTML = Handlebars.compile("" +
+            "<h1>Match-history</h1>" +
+            "<table>" +
+            "   <thead>" +
+            "       <tr>" +
+            "           <th>Runde</th>" +
+            "           <th>Resultat</th>" +
+            "           <th>Nutzer</th>" +
+            "           <th>PC</th>" +
+            "       </tr>" +
+            "   </thead>" +
+            "   {{#each records}}" +
+            "   <tr>" +
+            "       <td>{{this.round}}</td>" +
+            "       <td>{{this.result}}</td>" +
+            "       <td>{{this.user}}</td>" +
+            "       <td>{{this.pc}}</td>" +
+            "   </tr>" +
+            "   {{/each}}" +
+            "</table>")({ records: playedGames });
+    }
+
     render() {
         container.innerHTML += Handlebars.compile(
-            "<div id='game-header'></div>" +
-            "<div id='game-body'>" +
-            "   <div id='game-history'>History</div>" +
-            "   <div id='play-zone'>" +
-            "       Playzone" +
-            "   </div>" +
-            "</div>"
-        )();//this.state.config.username + "<button id='go-back-button'>Go back</button>"
+            "<header id='game-header'><h1>Schere Stein Papier (Brunnen und Streichholz edition)</h1></header>" +
+            "<section id='game-body'>" +
+            "   <aside id='game-history' ></aside>" +
+            "   <section id='play-zone'><h1>Aktuelles Spiel</h1>" +
+            "   </section>" +
+            "</section>"
+        )();
+
+        // testData
+        this.updateGameHistory([
+            { round: 1, result: "lost", user: "schere", pc: "stein"  },
+            { round: 2, result: "lost", user: "schere", pc: "stein"  },
+            { round: 3, result: "lost", user: "schere", pc: "stein"  },
+            { round: 4, result: "lost", user: "schere", pc: "stein"  },
+            { round: 5, result: "lost", user: "schere", pc: "stein"  },
+        ]);
     }
 }
