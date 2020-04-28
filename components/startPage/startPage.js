@@ -61,6 +61,14 @@ export default class StartPage {
             });
     }
 
+    sortAndRankRecords(records) {
+        let counter = 1;
+        return records.sort((x, y) => y.win - x.win).map(x => {
+            x.rank = counter++;
+            return x;
+        });
+    }
+
     updateRankingTable(loading = false) {
         let { recordsOnline, records } = this.state;
         let rankingContainer = document.getElementById("ranking-container");
@@ -68,17 +76,20 @@ export default class StartPage {
         if (loading) {
             rankingContainer.innerHTML = "Loading...";
         } else {
-            rankingContainer.innerHTML = this.renderRankingTable(this.getGameState().serverSide ? recordsOnline : records);
+            rankingContainer.innerHTML = this.renderRankingTable(this.getGameState().serverSide ? Object.values(recordsOnline) : records);
         }
     }
+
     renderRankingTable(records) {
+        records = this.sortAndRankRecords(records);
+
         let template = Handlebars.compile("" +
             "<h1>Rangliste</h1>" +
             "<table id='ranking-table'>" +
             "{{#each records}}" +
             "" +
             "   <tr>" +
-            "       <td><h2>{{this.place}}. Platz: {{this.user}}</h2>Siege: {{this.win}}</td>" +
+            "       <td><h2>{{this.rank}}. Platz: {{this.user}}</h2>Siege: {{this.win}}</td>" +
             "   </tr>" +
             "" +
             "{{/each}}" +
@@ -89,17 +100,16 @@ export default class StartPage {
     }
 
     renderConfig() {
-        return Handlebars.compile("" +
+        return "" +
             "<label id='server-switch' class='switch' for='server-check'>Mit Server spielen?" +
-            "    <input id='server-check' type='checkbox'>" +
+            `    <input id='server-check' type='checkbox' ${this.getGameState().serverSide ? 'checked' : ''}>` +
             "</label>" +
             "<label for='username-field'>Username" +
             "    <input required id='username-field' />" +
             "</label>" +
             "<button id='play-game-button'>" +
             "   Spiel starten" +
-            "</button>"
-        )();
+            "</button>";
     }
 
     render() {
