@@ -14,8 +14,6 @@ export default class App {
 
         // function bind because it is passed onto child components
         this.switchPage = this.switchPage.bind(this);
-        this.getServerSide = this.getServerSide.bind(this);
-        this.switchServerside = this.switchServerside.bind(this);
         this.getGameState = this.getGameState.bind(this);
         this.setGameState = this.setGameState.bind(this);
         this.render();
@@ -29,21 +27,9 @@ export default class App {
         this.state.gameState = gameState;
     }
 
-    getServerSide() {
-        return this.state.gameState.serverSide;
-    }
-
-    setUsername(username = "") {
-        this.state.gameState.username = username;
-    }
-
     switchPage() {
         this.state.playing = !this.state.playing;
         this.render();
-    }
-
-    switchServerside(value = !this.state.gameState.serverSide) {
-        this.state.gameState.serverSide = value;
     }
 
     render() {
