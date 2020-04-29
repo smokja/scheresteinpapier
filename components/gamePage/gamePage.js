@@ -15,7 +15,7 @@ export default class GamePage {
     }
 
     mountEventListeners() {
-        document.getElementById("go-back-button").addEventListener("click", () => this.switchPage());
+        // document.getElementById("go-back-button").addEventListener("click", () => this.switchPage());
     }
 
     updatePlayZone() {
@@ -23,19 +23,47 @@ export default class GamePage {
 
         playZoneContainer.innerHTML = "" +
             "<div id='play-pc-area'>" +
-            "   pc area" +
             "   <div class='card'></div>" +
             "</div>" +
             "<div id='play-border-area'>" +
-            "   border area" +
             "</div>" +
             "<div id='play-user-area'>" +
-            "   user area" +
-            "   <div class='card'></div>" +
-            "   <div class='card'></div>" +
-            "   <div class='card'></div>" +
-            "   <div class='card'></div>" +
-            "   <div class='card'></div>" +
+            "   <div class='card'>" +
+            "       <img alt='Bild von Schere' src='https://c4.wallpaperflare.com/wallpaper/896/12/900/anime-anime-girls-kill-la-kill-scissors-wallpaper-preview.jpg'>" +
+            "           <div class='info'>" +
+            "               Schere" +
+            "           </div>" +
+            "       </img>" +
+            "   </div>" +
+            "   <div class='card'>" +
+            "       <img alt='Bild von Stein' src='https://i.ytimg.com/vi/KxVJ1_38zwU/maxresdefault.jpg'>" +
+            "           <div class='info'>" +
+            "               Stein" +
+            "           </div>" +
+            "       </img>" +
+            "   </div>" +
+            "   <div class='card'>" +
+            "       <img alt='Bild von Papier' src='https://i.ytimg.com/vi/sbRpfv0L0_Q/maxresdefault.jpg'>" +
+            "           <div class='info'>" +
+            "               Papier" +
+            "           </div>" +
+            "       </img>" +
+            "   </div>" +
+            "   <div class='card'>" +
+            "       <img alt='Bild von Brunnen' src='img/jojo_fountain.PNG'>" +
+            "           <div class='info'>" +
+            "               Brunnen" +
+            "           </div>" +
+            "       </img>" +
+            "   </div>" +
+            "   <div class='card'>" +
+            "       <img alt='Bild von Streichholz' src='https://i.gifer.com/2pwq.gif'>" +
+            "           <div class='info'>" +
+            "               Streichholz" +
+            "           </div>" +
+            "       </img>" +
+            "   </div>" +
+
             "</div>" +
             "";
     }
