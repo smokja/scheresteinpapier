@@ -52,11 +52,15 @@ export default class StartPage {
 
     loadOnlineRanking() {
         this.updateRankingTable(true);
+
         fetch(server + "/ranking")
             .then(res => res.json())
             .then(json => {
                 this.state.recordsOnline = Object.values(json);
                 console.log(this.state.recordsOnline);
+                this.updateRankingTable(false);
+            })
+            .catch(() => {
                 this.updateRankingTable(false);
             });
     }
