@@ -43,7 +43,7 @@ export default class GamePage {
 
         e.target.classList.remove("disabled");
         e.target.classList.add("card-focused");
-        this.evaluateGame(e.target.innerText);
+        this.evaluateGame(e.target.querySelector("p").innerText);
     }
 
     updatePCCard(selectedCard) {
@@ -242,27 +242,27 @@ export default class GamePage {
             "<div id='play-user-area'>" +
             "   <div id='scissors-element' class='card'>" +
             "       <img alt='Bild von Schere' src='img/scissors.jpg'>" +
-            "           <div class='info'>Schere</div>" +
+            "           <div class='info'><p>Schere</p></div>" +
             "       </img>" +
             "   </div>" +
             "   <div id='stone-element' class='card'>" +
             "       <img alt='Bild von Stein' src='img/stone.jpg'>" +
-            "           <div class='info'>Stein</div>" +
+            "           <div class='info'><p>Stein</p></div>" +
             "       </img>" +
             "   </div>" +
             "   <div id='paper-element' class='card'>" +
             "       <img alt='Bild von Papier' src='img/paper.jpg'>" +
-            "           <div class='info'>Papier</div>" +
+            "           <div class='info'><p>Papier</p></div>" +
             "       </img>" +
             "   </div>" +
             "   <div id='fountain-element' class='card'>" +
             "       <img alt='Bild von Brunnen' src='img/jojo_fountain.PNG'>" +
-            "           <div class='info'>Brunnen</div>" +
+            "           <div class='info'><p>Brunnen<p></div>" +
             "       </img>" +
             "   </div>" +
             "   <div id='match-element' class='card'>" +
             "       <img alt='Bild von Streichholz' src='img/match.gif'>" +
-            "           <div class='info'>Streichholz</div>" +
+            "           <div class='info'><p>Streichholz</p></div>" +
             "       </img>" +
             "   </div>" +
             "</div>" +
