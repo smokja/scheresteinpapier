@@ -105,7 +105,7 @@ export default class GamePage {
                         this.state.loading = false;
                         this.updatePCCard(body.choice);
                         this.writeToHistory(body.choice, playerAction, body.win === undefined ? "=" : body.win);
-                        setTimeout(this.resetGame, 500);
+                        setTimeout(this.resetGame, 3000);
 
                     })
                     .catch((e) => {
