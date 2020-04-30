@@ -43,7 +43,7 @@ export default class GamePage {
 
         e.target.classList.remove("disabled");
         e.target.classList.add("card-focused");
-        this.evaluateGame(e.target.textContent);
+        this.evaluateGame(e.target.innerText);
     }
 
     updatePCCard(selectedCard) {
@@ -96,7 +96,7 @@ export default class GamePage {
     updateBorderScore() {
         let { userScore, pcScore } = this.state;
         let borderScoreP = document.getElementById("score-text");
-        borderScoreP.textContent = `Spieler ${userScore} : ${pcScore} PC`;
+        borderScoreP.innerText = `Spieler ${userScore} : ${pcScore} PC`;
     }
 
     writeToScore(result) {
@@ -120,11 +120,11 @@ export default class GamePage {
         let baseText = "Nächstes Spiel beginnt in ";
         for (let i = this.state.waitTimer; i > 0; i--) {
             console.log("in loop");
-            continueP.textContent = baseText + i + "...";
+            continueP.innerText = baseText + i + "...";
             await this.sleep(1000);
         }
 
-        continueP.textContent = "";
+        continueP.innerText = "";
     }
 
     sleep(time) {
