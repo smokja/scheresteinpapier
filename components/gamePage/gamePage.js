@@ -242,37 +242,27 @@ export default class GamePage {
             "<div id='play-user-area'>" +
             "   <div id='scissors-element' class='card'>" +
             "       <img alt='Bild von Schere' src='img/scissors.jpg'>" +
-            "           <div class='info'>" +
-            "               Schere" +
-            "           </div>" +
+            "           <div class='info'>Schere</div>" +
             "       </img>" +
             "   </div>" +
             "   <div id='stone-element' class='card'>" +
             "       <img alt='Bild von Stein' src='img/stone.jpg'>" +
-            "           <div class='info'>" +
-            "               Stein" +
-            "           </div>" +
+            "           <div class='info'>Stein</div>" +
             "       </img>" +
             "   </div>" +
             "   <div id='paper-element' class='card'>" +
             "       <img alt='Bild von Papier' src='img/paper.jpg'>" +
-            "           <div class='info'>" +
-            "               Papier" +
-            "           </div>" +
+            "           <div class='info'>Papier</div>" +
             "       </img>" +
             "   </div>" +
             "   <div id='fountain-element' class='card'>" +
             "       <img alt='Bild von Brunnen' src='img/jojo_fountain.PNG'>" +
-            "           <div class='info'>" +
-            "               Brunnen" +
-            "           </div>" +
+            "           <div class='info'>Brunnen</div>" +
             "       </img>" +
             "   </div>" +
             "   <div id='match-element' class='card'>" +
             "       <img alt='Bild von Streichholz' src='img/match.gif'>" +
-            "           <div class='info'>" +
-            "               Streichholz" +
-            "           </div>" +
+            "           <div class='info'>Streichholz</div>" +
             "       </img>" +
             "   </div>" +
             "</div>" +
