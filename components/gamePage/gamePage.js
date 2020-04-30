@@ -9,13 +9,12 @@ export default class GamePage {
             config: gameState,
             currentGameHistory: [],
             loading: false,
-            currentRound: 1
+            currentRound: 1,
+            userScore: 0,
+            pcScore: 0,
+            waitTimer: 5
         };
 
-        this.evaluateGame = this.evaluateGame.bind(this);
-        this.cardClicked = this.cardClicked.bind(this);
-        this.writeToHistory = this.writeToHistory.bind(this);
-        this.resetGame = this.resetGame.bind(this);
         this.render();
         this.mountEventListeners();
     }
@@ -23,7 +22,7 @@ export default class GamePage {
     mountEventListeners() {
         let cards = document.querySelectorAll("#play-user-area .card");
         cards.forEach((card) => {
-            card.addEventListener("click", this.cardClicked);
+            card.addEventListener("click", (e) => this.cardClicked(e));
         });
 
         // document.getElementById("go-back-button").addEventListener("click", () => this.switchPage());
@@ -83,7 +82,7 @@ export default class GamePage {
     writeToHistory(pcAction, userAction, result) {
         this.state.currentGameHistory.push({
             round: this.state.currentRound++,
-            result: result ? "win" : "lose",
+            result: result,
             user: userAction,
             pc: pcAction
         });
@@ -91,36 +90,76 @@ export default class GamePage {
         this.updateGameHistory();
     }
 
+    updateBorderScore() {
+        let { userScore, pcScore } = this.state;
+        let borderScoreP = document.getElementById("score-text");
+        borderScoreP.innerText = `Spieler ${userScore} : ${pcScore} PC`;
+    }
+
+    writeToScore(result) {
+        switch (result) {
+            case "=":
+                this.state.userScore++;
+                this.state.pcScore++;
+                break;
+            case "win":
+                this.state.userScore++;
+                break;
+            case "lose":
+                this.state.pcScore++;
+                break;
+        }
+
+        this.updateBorderScore();
+    }
+
+    async updateContinueText() {
+        console.log("test");
+        let continueP = document.getElementById("continue-text");
+        let baseText = "Nächstes Spiel beginnt in ";
+        for (let i = this.state.waitTimer; i > 0; i--) {
+            console.log("in loop");
+            continueP.innerText = baseText + i + "...";
+            await this.sleep(1000);
+        }
+
+        continueP.innerText = "";
+    }
+
+    sleep(time) {
+        return new Promise(resolve => setTimeout(resolve, time));
+    }
+
+    updateGame(pcAction, playerAction, result) {
+        this.updatePCCard(pcAction);
+        this.writeToHistory(pcAction, playerAction, result);
+        this.writeToScore(result);
+        this.updateContinueText();
+    }
 
     evaluateGame(playerAction) {
         console.log(playerAction);
         if (this.state.config.serverSide) {
             this.state.loading = true;
             this.updatePCCard();
-            try {
-                fetch(server + `/play?playerName=${this.state.config.username}&playerHand=${playerAction}`)
-                    .then(res => res.json())
-                    .then(body => {
-                        console.log(body, "body");
-                        this.state.loading = false;
-                        this.updatePCCard(body.choice);
-                        this.writeToHistory(body.choice, playerAction, body.win === undefined ? "=" : body.win);
-                        setTimeout(this.resetGame, 3000);
+            fetch(server + `/play?playerName=${this.state.config.username}&playerHand=${playerAction}`)
+                .then(res => res.json())
+                .then(body => {
+                    console.log(body, "body");
+                    this.state.loading = false;
+                    let result = typeof body.win === 'undefined' ? "=" : body.win  ? "win" : "lose";
+                    this.updateGame(body.choice, playerAction, result);
+                    setTimeout(() => this.resetGame(), this.state.waitTimer * 1000);
 
-                    })
-                    .catch((e) => {
-                        this.state.loading = false;
-                        this.updatePCCard();
-                        this.state.gameIsRunning = false;
-                    });
-            } catch (e) {
-                console.log(e);
-            }
+                })
+                .catch(() => {
+                    this.state.loading = false;
+                    this.updatePCCard();
+                    this.state.gameIsRunning = false;
+                });
         } else {
 
         }
-
-
     }
 
     resetGame() {
@@ -133,7 +172,6 @@ export default class GamePage {
         });
 
         pcCardImg.setAttribute("src", "img/hidden.jpg");
-
     }
 
     updatePlayZone() {
@@ -150,6 +188,11 @@ export default class GamePage {
             "   </div>" +
             "</div>" +
             "<div id='play-border-area'>" +
+            "   <span>" +
+            "       <h2>Score</h2>" +
+            "       <p id='score-text'>0 : 0</p>" +
+            "       <p id='continue-text'></p>" +
+            "   </span>" +
             "</div>" +
             "<div id='play-user-area'>" +
             "   <div id='scissors-element' class='card'>" +

@@ -6,7 +6,6 @@
 header {
     margin-bottom: 20px;
     text-align: center;
-    background-color: antiquewhite;
 }
 
 body, #game-body {
@@ -23,13 +22,10 @@ body, #game-body {
 
 #game-history {
     padding: 5px;
-    background-color: #d48184;
-    width: 225px;
+    border: 2px solid black;
 }
 
 #play-zone {
-    padding: 5px;
-    background-color: aquamarine;
     min-width: 535px;
     width: 100%;
 }
@@ -56,6 +52,7 @@ body {
 #play-border-area {
     height: 10%;
     background-color: darkorange;
+    text-align: center;
 
 }
 
@@ -84,8 +81,8 @@ body {
 
 #play-user-area .disabled, .disabled img {
     opacity: 0;
-    width: 0px;
-    height: 0px;
+    width: 0;
+    height: 0;
     margin: 0;
     padding: 0;
     transition: 1s;
