@@ -1,4 +1,5 @@
-import { createLinkElement, container, server } from "../../globals.js";
+import {container, createLinkElement, play_options, server} from "../../globals.js";
+
 
 export default class GamePage {
     constructor(switchPage, gameState) {
@@ -12,7 +13,7 @@ export default class GamePage {
             currentRound: 1,
             userScore: 0,
             pcScore: 0,
-            waitTimer: 5
+            waitTimer: 4
         };
 
         this.render();
@@ -25,7 +26,7 @@ export default class GamePage {
             card.addEventListener("click", (e) => this.cardClicked(e));
         });
 
-        // document.getElementById("go-back-button").addEventListener("click", () => this.switchPage());
+        document.getElementById("go-back-button").addEventListener("click", () => this.switchPage());
     }
 
 
@@ -45,32 +46,19 @@ export default class GamePage {
         this.evaluateGame(e.target.innerText);
     }
 
-    updatePCCard(selectedCard = "") {
+    updatePCCard(selectedCard) {
         console.log("got here")
         let pcCard = document.getElementById("play-pc-area").querySelector(".card");
         let pcCardImg = pcCard.querySelector("img");
         let pcCardInfo = pcCard.querySelector(".info");
-        let selectedImgPath = "img/";
-        switch (selectedCard.toLowerCase()) {
-            case "brunnen":
-                selectedImgPath += "jojo_fountain.PNG";
-                break;
-            case "schere":
-                selectedImgPath += "scissors.jpg";
-                break;
-            case "streichholz":
-                selectedImgPath += "match.gif";
-                break;
-            case "stein":
-                selectedImgPath += "stone.jpg";
-                break;
-            case "papier":
-                selectedImgPath += "paper.jpg";
-                break;
-            default:
-                selectedImgPath += "hidden.jpg"
-                break;
+        let play_option = play_options.filter(x => x.name === selectedCard)[0];
+        let selectedImgPath;
+        if (typeof play_option === 'undefined') {
+            selectedImgPath = "img/hidden.jpg";
+        } else {
+            selectedImgPath = "img/"+play_option.filename;
         }
+
         pcCardImg.setAttribute("src", selectedImgPath);
         if (this.state.loading) {
             pcCardInfo.classList.remove("hidden");
@@ -80,6 +68,7 @@ export default class GamePage {
     }
 
     writeToHistory(pcAction, userAction, result) {
+        let { username } = this.state.config;
         this.state.currentGameHistory.push({
             round: this.state.currentRound++,
             result: result,
@@ -87,6 +76,20 @@ export default class GamePage {
             pc: pcAction
         });
 
+        console.log(this.state.config.records, "before update");
+        let record = this.state.config.records.filter(x => x.user === username);
+        let winsToAdd = result === "win" ? 1 : 0;
+
+        if (record.length > 0) {
+            console.log(record);
+            record[0].win += winsToAdd;
+        } else {
+            this.state.config.records.push({
+                user: username,
+                win: winsToAdd
+            });
+        }
+        console.log(this.state.config.records, "after update");
         this.updateGameHistory();
     }
 
@@ -98,15 +101,13 @@ export default class GamePage {
 
     writeToScore(result) {
         switch (result) {
-            case "=":
-                this.state.userScore++;
-                this.state.pcScore++;
-                break;
             case "win":
                 this.state.userScore++;
                 break;
             case "lose":
                 this.state.pcScore++;
+                break;
+            default:
                 break;
         }
 
@@ -131,10 +132,49 @@ export default class GamePage {
     }
 
     updateGame(pcAction, playerAction, result) {
+        pcAction = (pcAction || "").toLowerCase();
         this.updatePCCard(pcAction);
         this.writeToHistory(pcAction, playerAction, result);
         this.writeToScore(result);
         this.updateContinueText();
+    }
+
+
+    getRandomInt(min, max) {
+        console.log(min);
+        console.log(max);
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    getRandomPCOption() {
+        let idx = this.getRandomInt(1, play_options.length);
+        return play_options.filter(x => x.id === idx)[0];
+    }
+
+    simulateGame(pcOption, playerAction) {
+        playerAction = (playerAction || "").toLowerCase();
+        let playerOption = play_options.filter(x => x.name === playerAction)[0];
+        let resultBody;
+        if (pcOption.id === playerOption.id) {
+            resultBody = {
+                pcAction: playerAction,
+                result: "="
+            };
+        } else if (playerOption.beats.filter(x => x === pcOption.id).length > 0) {
+            resultBody = {
+                pcAction: pcOption.name,
+                result: "win"
+            };
+        } else {
+            resultBody = {
+                pcAction: pcOption.name,
+                result: "lose"
+            };
+        }
+
+        return resultBody;
     }
 
     evaluateGame(playerAction) {
@@ -153,17 +193,22 @@ export default class GamePage {
 
                 })
                 .catch(() => {
-                    this.state.loading = false;
-                    this.updatePCCard();
-                    this.state.gameIsRunning = false;
+                    alert("Server not responding.");
+                    this.resetGame();
                 });
         } else {
-
+            let pcOption = this.getRandomPCOption();
+            let resultBody = this.simulateGame(pcOption, playerAction);
+            this.updateGame(resultBody.pcAction, playerAction, resultBody.result);
+            setTimeout(() => this.resetGame(), this.state.waitTimer * 1000);
         }
     }
 
+
     resetGame() {
+        this.state.loading = false;
         this.state.gameIsRunning = false;
+        this.updatePCCard();
         let cards = document.querySelectorAll("#play-user-area .card");
         let pcCardImg = document.getElementById("play-pc-area").querySelector(".card > img");
         cards.forEach((card) => {
@@ -190,7 +235,7 @@ export default class GamePage {
             "<div id='play-border-area'>" +
             "   <span>" +
             "       <h2>Score</h2>" +
-            "       <p id='score-text'>0 : 0</p>" +
+            "       <p id='score-text'></p>" +
             "       <p id='continue-text'></p>" +
             "   </span>" +
             "</div>" +
@@ -262,7 +307,10 @@ export default class GamePage {
 
     render() {
         container.innerHTML += Handlebars.compile(
-            "<header id='game-header'><h1>Schere Stein Papier (Brunnen und Streichholz edition)</h1></header>" +
+            "<header id='game-header'>" +
+            "   <h1>Schere Stein Papier (Brunnen und Streichholz edition) </h1> " +
+            "   <span class='button' id='go-back-button'>Zurück zur Startseite</span>" +
+            "</header>" +
             "<section id='game-body'>" +
             "   <aside id='game-history' ></aside>" +
             "   <section id='play-zone'>" +
@@ -273,5 +321,6 @@ export default class GamePage {
         this.updatePlayZone();
         this.updatePCCard();
         this.updateGameHistory();
+        this.updateBorderScore();
     }
 }

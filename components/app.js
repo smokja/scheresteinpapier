@@ -7,8 +7,9 @@ export default class App {
         this.state = {
             playing: false,
             gameState: {
-                serverSide: true,
-                username: "TestUser"
+                serverSide: false,
+                username: "",
+                records: []
             }
         }
 
@@ -37,7 +38,9 @@ export default class App {
         let { playing } = this.state;
 
         container.innerHTML = "";
-        if (playing) {
+        if (!playing) {
+            console.log("rendering startpage");
+            console.log(this.state.gameState.records, "before render");
             new StartPage(this.switchPage, this.setGameState, this.getGameState);
         } else {
             new GamePage(this.switchPage, this.state.gameState);

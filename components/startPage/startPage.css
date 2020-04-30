@@ -37,8 +37,7 @@ header {
 }
 
 #play-game-button {
-    height: 30px;
-    margin: auto;
+    margin-top: 20px;
 }
 
 #server-check-label {

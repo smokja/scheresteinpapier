@@ -22,7 +22,11 @@ body, #game-body {
 
 #game-history {
     padding: 5px;
+    padding-right: 70px;
     border: 2px solid black;
+    overflow-y: scroll;
+    overflow-x: hidden;
+
 }
 
 #play-zone {
@@ -258,3 +262,16 @@ body {
     }
 }
 /* loading spinner */
+
+#game-header h1 {
+    display: inline;
+}
+
+#go-back-button {
+    width: 300px;
+    display: block;
+    margin: auto;
+    float:right;
+}
+
+

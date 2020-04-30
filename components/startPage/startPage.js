@@ -7,8 +7,7 @@ export default class StartPage {
         container.appendChild(createLinkElement("./components/startPage/startPage.css"));
         console.log(container);
         this.state = {
-            recordsOnline: [],
-            records: []
+            recordsOnline: []
         }
         this.serverSwitchChanged = this.serverSwitchChanged.bind(this);
         this.playGame = this.playGame.bind(this);
@@ -27,7 +26,8 @@ export default class StartPage {
             let gameState = this.getGameState();
             this.setGameState({
                 username: username.value,
-                serverSide: gameState.serverSide
+                serverSide: gameState.serverSide,
+                records: gameState.records
             });
             this.switchPage();
         } else {
@@ -41,8 +41,10 @@ export default class StartPage {
         let serverSide = e.target.checked;
         this.setGameState({
             serverSide: serverSide,
-            username: gameState.username
+            username: gameState.username,
+            records: gameState.records
         });
+
         if (serverSide) {
             this.loadOnlineRanking();
         } else {
@@ -74,7 +76,9 @@ export default class StartPage {
     }
 
     updateRankingTable(loading = false) {
-        let { recordsOnline, records } = this.state;
+        let { recordsOnline } = this.state;
+        let records = this.getGameState().records;
+        console.log(records);
         let rankingContainer = document.getElementById("ranking-container");
 
         if (loading) {
@@ -85,6 +89,7 @@ export default class StartPage {
     }
 
     renderRankingTable(records) {
+        console.log(records);
         records = this.sortAndRankRecords(records);
 
         let template = Handlebars.compile("" +
@@ -111,13 +116,14 @@ export default class StartPage {
             "<label for='username-field'>Username" +
             "    <input required id='username-field' />" +
             "</label>" +
-            "<button id='play-game-button'>" +
+            "<div class='button' id='play-game-button'>" +
             "   Spiel starten" +
-            "</button>";
+            "</div>";
     }
 
     render() {
-        let { records } = this.state;
+        let records = this.getGameState().records;
+        console.log(records, "render records");
         container.innerHTML += "" +
             "<header><h1>Willkommen beim besten Spiel der Welt: Schere-Stein-Papier</h1></header>" +
             "" +
