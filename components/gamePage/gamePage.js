@@ -233,11 +233,11 @@ export default class GamePage {
             "   </div>" +
             "</div>" +
             "<div id='play-border-area'>" +
-            "   <span>" +
+            "   <div>" +
             "       <h2>Score</h2>" +
             "       <p id='score-text'></p>" +
             "       <p id='continue-text'></p>" +
-            "   </span>" +
+            "   </div>" +
             "</div>" +
             "<div id='play-user-area'>" +
             "   <div id='scissors-element' class='card'>" +
