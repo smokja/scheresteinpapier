@@ -170,22 +170,18 @@ export default class GamePage {
         return resultBody;
     }
 
-    evaluateGame(playerAction) {
+    async evaluateGame(playerAction) {
         if (this.state.config.serverSide) {
             this.state.loading = true;
             this.updatePCCard();
-            fetch(server + `/play?playerName=${this.state.config.username}&playerHand=${playerAction}`)
-                .then(res => res.json())
-                .then(body => {
-                    this.state.loading = false;
-                    let result = typeof body.win === 'undefined' ? "=" : body.win  ? "win" : "lose";
-                    this.updateGame(body.choice, playerAction, result);
-                    setTimeout(() => this.resetGame(), this.state.waitTimer * 1000);
-
-                })
-                .catch(() => {
-                    this.resetGame();
-                });
+            try {
+                let result = await Api.sendRequest(this.state.config.username, playerAction);
+                this.state.loading = false;
+                this.updateGame(result.pcAction, playerAction, result.resultText);
+                setTimeout(() => this.resetGame(), this.state.waitTimer * 1000);
+            } catch {
+                this.resetGame();
+            }
         } else {
             let pcOption = this.getRandomPCOption();
             let resultBody = this.simulateGame(pcOption, playerAction);
