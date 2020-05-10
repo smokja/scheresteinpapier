@@ -26,7 +26,7 @@ export default class StartPage {
         const { serverSwitch, playGameButton, usernameField } = this.state.querySelector;
         serverSwitch.addEventListener("change", this.serverSwitchChanged);
         playGameButton.addEventListener("click", this.playGame);
-        usernameField.addEventListener("change", this.updateUsernameField)
+        usernameField.addEventListener("change", this.updateUsernameField);
     }
 
     setRelevantQuerySelectorConstants() {
@@ -98,11 +98,27 @@ export default class StartPage {
     }
 
     sortAndRankRecords(records) {
+
         let counter = 1;
-        return records.sort((x, y) => y.win - x.win).map(x => {
+        let sorted = records.sort((x, y) => y.win - x.win).map(x => {
             x.rank = counter++;
             return x;
         });
+
+        let lastHighestWins = 0;
+        let lastRank = 1;
+        sorted.forEach(x => {
+            if (x.win === lastHighestWins) {
+                x.rank = lastRank;
+            } else {
+                x.rank = lastRank++;
+                lastHighestWins = x.win;
+            }
+
+            return x;
+        });
+
+        return sorted.slice(0, 10);
     }
 
     updateRankingTable(loading = false) {
