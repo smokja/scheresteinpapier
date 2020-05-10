@@ -33,7 +33,6 @@ export default class StartPage {
             this.switchPage();
         } else {
             username.classList.add("not-filled");
-            alert("Username is required");
         }
     }
 

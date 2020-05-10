@@ -184,7 +184,6 @@ export default class GamePage {
 
                 })
                 .catch(() => {
-                    alert("Server not responding.");
                     this.resetGame();
                 });
         } else {
