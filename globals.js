@@ -1,3 +1,4 @@
+'use strict';
 export const container = document.body;
 export const server = "https://us-central1-schere-stein-papier-ee0c9.cloudfunctions.net/widgets";
 export const play_options = [

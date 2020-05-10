@@ -1,3 +1,4 @@
+'use strict';
 import { container, createLinkElement, server } from "../../globals.js";
 export default class StartPage {
     constructor(switchPage, setGameState, getGameState) {
@@ -5,7 +6,7 @@ export default class StartPage {
         this.setGameState = setGameState;
         this.getGameState = getGameState;
         container.appendChild(createLinkElement("./components/startPage/startPage.css"));
-        console.log(container);
+
         this.state = {
             recordsOnline: []
         }
@@ -59,7 +60,7 @@ export default class StartPage {
             .then(res => res.json())
             .then(json => {
                 this.state.recordsOnline = Object.values(json);
-                console.log(this.state.recordsOnline);
+
                 this.updateRankingTable(false);
             })
             .catch(() => {
@@ -78,7 +79,7 @@ export default class StartPage {
     updateRankingTable(loading = false) {
         let { recordsOnline } = this.state;
         let records = this.getGameState().records;
-        console.log(records);
+
         let rankingContainer = document.getElementById("ranking-container");
 
         if (loading) {
@@ -89,7 +90,7 @@ export default class StartPage {
     }
 
     renderRankingTable(records) {
-        console.log(records);
+
         records = this.sortAndRankRecords(records);
 
         let template = Handlebars.compile("" +
@@ -123,7 +124,7 @@ export default class StartPage {
 
     render() {
         let records = this.getGameState().records;
-        console.log(records, "render records");
+
         container.innerHTML += "" +
             "<header><h1>Willkommen beim besten Spiel der Welt: Schere-Stein-Papier</h1></header>" +
             "" +

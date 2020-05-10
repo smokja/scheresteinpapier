@@ -1,3 +1,4 @@
+'use strict';
 import {container, createLinkElement, play_options, server} from "../../globals.js";
 
 
@@ -47,7 +48,6 @@ export default class GamePage {
     }
 
     updatePCCard(selectedCard) {
-        console.log("got here")
         let pcCard = document.getElementById("play-pc-area").querySelector(".card");
         let pcCardImg = pcCard.querySelector("img");
         let pcCardInfo = pcCard.querySelector(".info");
@@ -76,12 +76,10 @@ export default class GamePage {
             pc: pcAction
         });
 
-        console.log(this.state.config.records, "before update");
         let record = this.state.config.records.filter(x => x.user === username);
         let winsToAdd = result === "win" ? 1 : 0;
 
         if (record.length > 0) {
-            console.log(record);
             record[0].win += winsToAdd;
         } else {
             this.state.config.records.push({
@@ -89,7 +87,6 @@ export default class GamePage {
                 win: winsToAdd
             });
         }
-        console.log(this.state.config.records, "after update");
         this.updateGameHistory();
     }
 
@@ -115,11 +112,9 @@ export default class GamePage {
     }
 
     async updateContinueText() {
-        console.log("test");
         let continueP = document.getElementById("continue-text");
         let baseText = "Nächstes Spiel beginnt in ";
         for (let i = this.state.waitTimer; i > 0; i--) {
-            console.log("in loop");
             continueP.innerText = baseText + i + "...";
             await this.sleep(1000);
         }
@@ -141,8 +136,6 @@ export default class GamePage {
 
 
     getRandomInt(min, max) {
-        console.log(min);
-        console.log(max);
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min)) + min;
@@ -178,14 +171,12 @@ export default class GamePage {
     }
 
     evaluateGame(playerAction) {
-        console.log(playerAction);
         if (this.state.config.serverSide) {
             this.state.loading = true;
             this.updatePCCard();
             fetch(server + `/play?playerName=${this.state.config.username}&playerHand=${playerAction}`)
                 .then(res => res.json())
                 .then(body => {
-                    console.log(body, "body");
                     this.state.loading = false;
                     let result = typeof body.win === 'undefined' ? "=" : body.win  ? "win" : "lose";
                     this.updateGame(body.choice, playerAction, result);
@@ -270,7 +261,6 @@ export default class GamePage {
     }
 
     updateGameHistory(playedGames = this.state.currentGameHistory) {
-        console.log(playedGames);
         let gameHistoryContainer = document.getElementById("game-history");
         gameHistoryContainer.innerHTML = Handlebars.compile("" +
             "<h1>Username: "+this.state.config.username+"</h1><br />" +
