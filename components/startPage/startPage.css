@@ -1,5 +1,6 @@
 
 
+/*noinspection CssUnusedSymbol*/
 .not-filled {
     background-color: #d48184;
 }
@@ -40,11 +41,6 @@ header {
     margin-top: 20px;
 }
 
-#server-check-label {
-    margin-left: 10px;
-    vertical-align: center;
-}
-
 #config-container {
     margin: auto;
     text-align: center;
@@ -59,8 +55,7 @@ header {
 #username-field-label {
     display: block;
     width: 200px;
-    margin: auto;
-    margin-top: 10px;
+    margin: 10px auto auto;
 }
 
 #username-field {
@@ -74,6 +69,7 @@ header {
     opacity: 0;
 }
 
+/*noinspection CssUnusedSymbol*/
 #username-error.error-shown {
     height: 100%;
     opacity: 1;

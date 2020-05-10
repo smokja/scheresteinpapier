@@ -106,7 +106,7 @@ export default class GamePage {
     updatePCCard(selectedCard) {
         const { pcCardImg, pcCardInfo } = this.state.querySelector.playZone;
         const play_option = play_options.filter(x => x.name === selectedCard)[0];
-        let selectedImgPath = "";
+        let selectedImgPath;
         if (typeof play_option === 'undefined') {
             selectedImgPath = "img/hidden.jpg";
         } else {
