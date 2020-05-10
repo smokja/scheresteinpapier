@@ -1,5 +1,12 @@
 'use strict';
-import {container, createLinkElement, play_options, server} from "../../globals.js";
+import {
+    container,
+    createLinkElement,
+    play_options,
+    sleep,
+    getRandomInt
+} from "../../globals.js";
+import Api from "../../api/api.js";
 
 
 export default class GamePage {
@@ -14,7 +21,10 @@ export default class GamePage {
             currentRound: 1,
             userScore: 0,
             pcScore: 0,
-            waitTimer: 4
+            waitTimer: 4,
+            querySelector: {
+                playZone: {}
+            }
         };
 
         this.render();
@@ -22,37 +32,81 @@ export default class GamePage {
     }
 
     mountEventListeners() {
-        let cards = document.querySelectorAll("#play-user-area .card");
-        cards.forEach((card) => {
-            card.addEventListener("click", (e) => this.cardClicked(e));
+        const { goBackButton } = this.state.querySelector;
+        const { playerCards } = this.state.querySelector.playZone;
+
+        playerCards.forEach((card) => {
+            card.addEventListener("click", (e) => this.cardClickedEventHandler(e));
         });
 
-        document.getElementById("go-back-button").addEventListener("click", () => this.switchPage());
+        goBackButton.addEventListener("click", () => this.switchPage());
+    }
+
+    setRelevantQuerySelectorConstants() {
+        this.state.querySelector = {
+            goBackButton: document.getElementById("go-back-button"),
+            playZoneContainer: document.getElementById("play-zone"),
+            gameHistoryContainer: document.getElementById("game-history")
+        };
+    }
+
+    setPlayerZoneQuerySelectorConstants() {
+        const pcCard = document.getElementById("play-pc-area").querySelector(".card");
+        this.state.querySelector.playZone = {
+            playerCards: document.querySelectorAll("#play-user-area .card"),
+            pcCardImg: pcCard.querySelector("img"),
+            pcCardInfo: pcCard.querySelector(".info"),
+            continuePElement: document.getElementById("continue-text")
+        };
     }
 
 
-    cardClicked(e) {
+    cardClickedEventHandler(e) {
         if (this.state.gameIsRunning) {
             return;
         }
 
         this.state.gameIsRunning = true;
-        let cards = document.querySelectorAll("#play-user-area .card");
-        cards.forEach((card) => {
-            card.classList.add("disabled");
-        });
-
-        e.target.classList.remove("disabled");
-        e.target.classList.add("card-focused");
+        this.updatePlayerCards(true);
+        this.updateActivePlayerCard(e.target);
         this.evaluateGame(e.target.querySelector("p").innerText);
     }
 
+    updatePlayerCards(disabled) {
+        const { playerCards } = this.state.querySelector.playZone;
+        if (disabled) {
+            playerCards.forEach((card) => {
+                this.updateCard(card, true, false);
+            });
+        } else {
+            playerCards.forEach((card) => {
+                this.updateCard(card, false, false);
+            });
+        }
+    }
+
+    updateCard(card, disabled, cardFocused) {
+        if (disabled) {
+            card.classList.add("disabled");
+        } else {
+            card.classList.remove("disabled");
+        }
+
+        if (cardFocused) {
+            card.classList.add("card-focused");
+        } else {
+            card.classList.remove("card-focused");
+        }
+    }
+
+    updateActivePlayerCard(playerCard) {
+        this.updateCard(playerCard, false, true);
+    }
+
     updatePCCard(selectedCard) {
-        let pcCard = document.getElementById("play-pc-area").querySelector(".card");
-        let pcCardImg = pcCard.querySelector("img");
-        let pcCardInfo = pcCard.querySelector(".info");
-        let play_option = play_options.filter(x => x.name === selectedCard)[0];
-        let selectedImgPath;
+        const { pcCardImg, pcCardInfo } = this.state.querySelector.playZone;
+        const play_option = play_options.filter(x => x.name === selectedCard)[0];
+        let selectedImgPath = "";
         if (typeof play_option === 'undefined') {
             selectedImgPath = "img/hidden.jpg";
         } else {
@@ -68,7 +122,7 @@ export default class GamePage {
     }
 
     writeToHistory(pcAction, userAction, result) {
-        let { username } = this.state.config;
+        const { username } = this.state.config;
         this.state.currentGameHistory.push({
             round: this.state.currentRound++,
             result: result,
@@ -76,8 +130,8 @@ export default class GamePage {
             pc: pcAction
         });
 
-        let record = this.state.config.records.filter(x => x.user === username);
-        let winsToAdd = result === "win" ? 1 : 0;
+        const record = this.state.config.records.filter(x => x.user === username);
+        const winsToAdd = result === "win" ? 1 : 0;
 
         if (record.length > 0) {
             record[0].win += winsToAdd;
@@ -87,12 +141,13 @@ export default class GamePage {
                 win: winsToAdd
             });
         }
+
         this.updateGameHistory();
     }
 
     updateBorderScore() {
-        let { userScore, pcScore } = this.state;
-        let borderScoreP = document.getElementById("score-text");
+        const { userScore, pcScore } = this.state;
+        const borderScoreP = document.getElementById("score-text");
         borderScoreP.innerText = `Spieler ${userScore} : ${pcScore} PC`;
     }
 
@@ -112,43 +167,33 @@ export default class GamePage {
     }
 
     async updateContinueText() {
-        let continueP = document.getElementById("continue-text");
-        let baseText = "Nächstes Spiel beginnt in ";
+        const { continuePElement } = this.state.querySelector.playZone;
+        const baseText = "Nächstes Spiel beginnt in ";
         for (let i = this.state.waitTimer; i > 0; i--) {
-            continueP.innerText = baseText + i + "...";
-            await this.sleep(1000);
+            continuePElement.innerText = baseText + i + "...";
+            await sleep(1000);
         }
 
-        continueP.innerText = "";
-    }
-
-    sleep(time) {
-        return new Promise(resolve => setTimeout(resolve, time));
+        continuePElement.innerText = "";
     }
 
     updateGame(pcAction, playerAction, result) {
         pcAction = (pcAction || "").toLowerCase();
+        playerAction = (playerAction || "").toLowerCase();
         this.updatePCCard(pcAction);
         this.writeToHistory(pcAction, playerAction, result);
         this.writeToScore(result);
         this.updateContinueText();
     }
 
-
-    getRandomInt(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min)) + min;
-    }
-
     getRandomPCOption() {
-        let idx = this.getRandomInt(1, play_options.length);
+        const idx = getRandomInt(1, play_options.length);
         return play_options.filter(x => x.id === idx)[0];
     }
 
     simulateGame(pcOption, playerAction) {
         playerAction = (playerAction || "").toLowerCase();
-        let playerOption = play_options.filter(x => x.name === playerAction)[0];
+        const playerOption = play_options.filter(x => x.name === playerAction)[0];
         let resultBody;
         if (pcOption.id === playerOption.id) {
             resultBody = {
@@ -175,7 +220,7 @@ export default class GamePage {
             this.state.loading = true;
             this.updatePCCard();
             try {
-                let result = await Api.sendRequest(this.state.config.username, playerAction);
+                const result = await Api.sendRequest(this.state.config.username, playerAction);
                 this.state.loading = false;
                 this.updateGame(result.pcAction, playerAction, result.resultText);
                 setTimeout(() => this.resetGame(), this.state.waitTimer * 1000);
@@ -183,8 +228,8 @@ export default class GamePage {
                 this.resetGame();
             }
         } else {
-            let pcOption = this.getRandomPCOption();
-            let resultBody = this.simulateGame(pcOption, playerAction);
+            const pcOption = this.getRandomPCOption();
+            const resultBody = this.simulateGame(pcOption, playerAction);
             this.updateGame(resultBody.pcAction, playerAction, resultBody.result);
             setTimeout(() => this.resetGame(), this.state.waitTimer * 1000);
         }
@@ -192,21 +237,16 @@ export default class GamePage {
 
 
     resetGame() {
+        const { pcCardImg } = this.state.querySelector.playZone;
         this.state.loading = false;
         this.state.gameIsRunning = false;
         this.updatePCCard();
-        let cards = document.querySelectorAll("#play-user-area .card");
-        let pcCardImg = document.getElementById("play-pc-area").querySelector(".card > img");
-        cards.forEach((card) => {
-            card.classList.remove("disabled");
-            card.classList.remove("card-focused");
-        });
-
+        this.updatePlayerCards(false);
         pcCardImg.setAttribute("src", "img/hidden.jpg");
     }
 
-    updatePlayZone() {
-        let playZoneContainer = document.getElementById("play-zone");
+    renderPlayZone() {
+        const { playZoneContainer } = this.state.querySelector;
 
         playZoneContainer.innerHTML = "" +
             "<div id='play-pc-area'>" +
@@ -253,10 +293,12 @@ export default class GamePage {
             "   </div>" +
             "</div>" +
             "";
+
+        this.setPlayerZoneQuerySelectorConstants();
     }
 
     updateGameHistory(playedGames = this.state.currentGameHistory) {
-        let gameHistoryContainer = document.getElementById("game-history");
+        const { gameHistoryContainer } = this.state.querySelector;
         gameHistoryContainer.innerHTML = Handlebars.compile("" +
             "<h1>Username: "+this.state.config.username+"</h1><br />" +
             "<h1>Match-history</h1>" +
@@ -292,8 +334,9 @@ export default class GamePage {
             "   </section>" +
             "</section>"
         )();
+        this.setRelevantQuerySelectorConstants();
+        this.renderPlayZone();
 
-        this.updatePlayZone();
         this.updatePCCard();
         this.updateGameHistory();
         this.updateBorderScore();

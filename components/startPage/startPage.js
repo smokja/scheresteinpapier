@@ -1,5 +1,5 @@
 'use strict';
-import { container, createLinkElement, server } from "../../globals.js";
+import { container, createLinkElement } from "../../globals.js";
 import Api from "../../api/api.js";
 export default class StartPage {
     constructor(switchPage, setGameState, getGameState) {
@@ -35,7 +35,8 @@ export default class StartPage {
             usernameField: document.getElementById("username-field"),
             serverSwitch: document.getElementById("server-switch"),
             playGameButton: document.getElementById("play-game-button"),
-            usernameError: document.getElementById("username-error")
+            usernameError: document.getElementById("username-error"),
+            rankingContainer: document.getElementById("ranking-container")
         };
     }
 
@@ -43,7 +44,7 @@ export default class StartPage {
         const username = this.state.querySelector.usernameField;
         const validity = username.checkValidity();
         if (validity) {
-            let gameState = this.getGameState();
+            const gameState = this.getGameState();
             this.setGameState({
                 username: username.value,
                 serverSide: gameState.serverSide,
@@ -56,8 +57,8 @@ export default class StartPage {
     }
 
     serverSwitchChangedEventHandler(e) {
-        let gameState = this.getGameState();
-        let serverSide = e.target.checked;
+        const gameState = this.getGameState();
+        const serverSide = e.target.checked;
         this.setGameState({
             serverSide: serverSide,
             username: gameState.username,
@@ -73,7 +74,7 @@ export default class StartPage {
 
     sortAndRankRecords(records) {
         let counter = 1;
-        let sorted = records.sort((x, y) => y.win - x.win).map(x => {
+        const sorted = records.sort((x, y) => y.win - x.win).map(x => {
             x.rank = counter++;
             return x;
         });
@@ -97,14 +98,13 @@ export default class StartPage {
     async loadOnlineRanking() {
         this.updateRankingTable(true);
         this.state.recordsOnline = await Api.getRankingList();
-        console.log(this.state.recordsOnline);
         this.updateRankingTable(false);
     }
 
     updateUsernameField() {
         const { usernameField, usernameError } = this.state.querySelector;
         const validity = usernameField.checkValidity();
-        console.log(validity);
+
         if (validity) {
             usernameField.classList.remove("not-filled");
             usernameError.classList.remove("error-shown");
@@ -115,10 +115,9 @@ export default class StartPage {
     }
 
     updateRankingTable(loading = false) {
-        let { recordsOnline } = this.state;
-        let records = this.getGameState().records;
-
-        let rankingContainer = document.getElementById("ranking-container");
+        const { recordsOnline } = this.state;
+        const { rankingContainer } = this.state.querySelector;
+        const records = this.getGameState().records;
 
         if (loading) {
             rankingContainer.innerHTML = "Loading...";
@@ -128,7 +127,7 @@ export default class StartPage {
     }
 
     render() {
-        let records = this.getGameState().records;
+        const records = this.getGameState().records;
 
         container.innerHTML += "" +
             "<header><h1>Willkommen beim besten Spiel der Welt: Schere-Stein-Papier</h1></header>" +
@@ -141,18 +140,17 @@ export default class StartPage {
                 this.renderConfig() +
             "</section>";
 
+        this.setRelevantQuerySelectorConstants();
+
         if (this.getGameState().serverSide) {
             this.loadOnlineRanking();
         }
-
-        this.setRelevantQuerySelectorConstants();
     }
 
-    renderRankingTable(records) {
-        console.log(records);
-        records = this.sortAndRankRecords(records);
+    renderRankingTable(input) {
+        const records = this.sortAndRankRecords(input);
 
-        let template = Handlebars.compile("" +
+        const template = Handlebars.compile("" +
             "<h1>Rangliste</h1>" +
             "<table id='ranking-table'>" +
             "{{#each records}}" +
