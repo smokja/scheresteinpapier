@@ -46,10 +46,43 @@ header {
 }
 
 #config-container {
+    margin: auto;
     text-align: center;
+    width: 300px;
 }
 
-#config-container > label,button {
-    margin-right: 20px;
+#server-switch {
+    display: inline-block;
+    margin-top: 10px;
 }
 
+#username-field-label {
+    display: block;
+    width: 200px;
+    margin: auto;
+    margin-top: 10px;
+}
+
+#username-field {
+    width: 100%;
+}
+
+#username-error {
+    height: 0;
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+}
+
+#username-error.error-shown {
+    height: 100%;
+    opacity: 1;
+    visibility: visible;
+    display: block;
+    background-color: #d48184;
+    color: white;
+    width: 100%;
+    border-radius: 3px;
+    transform-origin: center top;
+    transition: visibility 0s, opacity 2s linear;
+}

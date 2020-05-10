@@ -12,7 +12,7 @@ export default class App {
                 username: "",
                 records: []
             }
-        }
+        };
 
         // function bind because it is passed onto child components
         this.switchPage = this.switchPage.bind(this);

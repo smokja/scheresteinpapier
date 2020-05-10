@@ -8,22 +8,40 @@ export default class StartPage {
         container.appendChild(createLinkElement("./components/startPage/startPage.css"));
 
         this.state = {
-            recordsOnline: []
-        }
+            recordsOnline: [],
+            querySelector: {}
+        };
+
+        // function binding
         this.serverSwitchChanged = this.serverSwitchChanged.bind(this);
         this.playGame = this.playGame.bind(this);
+        this.updateUsernameField = this.updateUsernameField.bind(this);
+
+        // page build up
         this.render();
         this.mountEventListener();
     }
 
     mountEventListener() {
-        document.getElementById("server-switch").addEventListener("change", this.serverSwitchChanged);
-        document.getElementById("play-game-button").addEventListener("click", this.playGame);
+        const { serverSwitch, playGameButton, usernameField } = this.state.querySelector;
+        serverSwitch.addEventListener("change", this.serverSwitchChanged);
+        playGameButton.addEventListener("click", this.playGame);
+        usernameField.addEventListener("change", this.updateUsernameField)
+    }
+
+    setRelevantQuerySelectorConstants() {
+        this.state.querySelector = {
+            usernameField: document.getElementById("username-field"),
+            serverSwitch: document.getElementById("server-switch"),
+            playGameButton: document.getElementById("play-game-button"),
+            usernameError: document.getElementById("username-error")
+        };
     }
 
     playGame() {
-        let username = document.getElementById("username-field");
-        if (username.checkValidity()) {
+        const username = this.state.querySelector.usernameField;
+        const validity = username.checkValidity();
+        if (validity) {
             let gameState = this.getGameState();
             this.setGameState({
                 username: username.value,
@@ -32,7 +50,20 @@ export default class StartPage {
             });
             this.switchPage();
         } else {
-            username.classList.add("not-filled");
+            this.updateUsernameField();
+        }
+    }
+
+    updateUsernameField() {
+        const { usernameField, usernameError } = this.state.querySelector;
+        const validity = usernameField.checkValidity();
+        console.log(validity);
+        if (validity) {
+            usernameField.classList.remove("not-filled");
+            usernameError.classList.remove("error-shown");
+        } else {
+            usernameField.classList.add("not-filled");
+            usernameError.classList.add("error-shown");
         }
     }
 
@@ -59,7 +90,6 @@ export default class StartPage {
             .then(res => res.json())
             .then(json => {
                 this.state.recordsOnline = Object.values(json);
-
                 this.updateRankingTable(false);
             })
             .catch(() => {
@@ -113,8 +143,9 @@ export default class StartPage {
             "<label id='server-switch' class='switch' for='server-check'>Mit Server spielen?" +
             `    <input id='server-check' type='checkbox' ${this.getGameState().serverSide ? 'checked' : ''}>` +
             "</label>" +
-            "<label for='username-field'>Username" +
+            "<label id='username-field-label' for='username-field'>Benutzernamen eingeben:" +
             "    <input required id='username-field' />" +
+            "    <label id='username-error' for='username-field'>Bitte einen Namen eingeben!</label>" +
             "</label>" +
             "<div class='button' id='play-game-button'>" +
             "   Spiel starten" +
@@ -138,5 +169,7 @@ export default class StartPage {
         if (this.getGameState().serverSide) {
             this.loadOnlineRanking();
         }
+
+        this.setRelevantQuerySelectorConstants();
     }
 }
